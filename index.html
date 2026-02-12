@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educato - AI Study Partner</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f9; margin: 0; }
+        
+        /* The main layout wrapper */
+        .wrapper { display: flex; flex-direction: column; min-height: 100vh; }
+        
+        /* The header */
+        header { padding: 20px 40px; background: white; border-bottom: 1px solid #eee; text-align: center; }
+        
+        /* The main content area where portal and history sit */
+        main { flex: 1; display: flex; justify-content: center; padding: 40px 20px; gap: 30px; flex-wrap: wrap; }
+        
+        /* Left Side: The App Container */
+        .app-container { background: white; flex: 2; max-width: 700px; min-width: 350px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        
+        /* Right Side: History */
+        .history-container { background: white; flex: 1; min-width: 280px; max-width: 350px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); height: fit-content; }
+        
+        /* Styling elements */
+        h2 { margin-top: 0; color: #2c3e50; }
+        .status-badge { display: block; font-size: 12px; font-weight: bold; color: #bdc3c7; margin-bottom: 20px; letter-spacing: 1px; }
+        select, textarea { width: 100%; padding: 12px; margin-top: 10px; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; }
+        textarea { height: 120px; }
+        .ask-btn { width: 100%; background: #3498db; color: white; padding: 15px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        
+        .premium-box { margin-top: 25px; padding: 20px; border: 2px dashed #f1c40f; border-radius: 15px; text-align: center; background: #fffdf0; }
+        .pay-btn { width: 100%; background: #000; color: white; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
+        footer { text-align: center; padding: 20px; font-size: 11px; color: #95a5a6; letter-spacing: 2px; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <header>
+            <h1 style="margin: 0; color: #2c3e50;">Educato</h1>
+        </header>
+
+        <main>
+            <div class="app-container">
+                <div style="text-align: center;">
+                    <h2>🎓 Educato Portal</h2>
+                    <span class="status-badge">FREE ACCOUNT</span>
+                </div>
+
+                <label>Choose Book</label>
+                <select id="bookSelect">
+                    <option>Physics: Fundamentals</option>
+                    <option>Organic Chemistry</option>
+                    <option>Advanced Mathematics</option>
+                </select>
+
+                <label style="display:block; margin-top: 20px;">Your Question</label>
+                <textarea id="userQuestion" placeholder="Type your question here..."></textarea>
+
+                <button class="ask-btn" onclick="askQuestion()">Ask AI (Instant)</button>
+
+                <div class="premium-box">
+                    <p style="margin:0; color: #7f8c8d;">Unlock Human Experts & Unlimited AI</p>
+                    <button class="pay-btn">Pay $1 with GPay</button>
+                </div>
+                
+                <div id="result-box" style="margin-top: 20px; line-height: 1.6;"></div>
+            </div>
+
+            <div class="history-container">
+                <h3>🕒 Recent Questions</h3>
+                <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 15px;">
+                <div id="historyList">Loading memory...</div>
+            </div>
+        </main>
+
+        <footer>
+            Powered by <strong>TEAM SMGS</strong>
+        </footer>
+    </div>
+
+    <script>
+        // Your existing script logic goes here (fetch functions, etc.)
+    </script>
+</body>
+</html>
