@@ -204,7 +204,7 @@ app.post('/ask-ai', async (req, res) => {
     } catch (error) { res.status(500).send(error); }
 });
 async function loadHistory() {
-    const response = await fetch('http://localhost:3000/history');
+    const response = await fetch('/history');
     const data = await response.json();
     const list = document.getElementById('historyList');
     
