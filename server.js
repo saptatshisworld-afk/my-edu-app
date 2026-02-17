@@ -1,48 +1,58 @@
 const express = require('express');
-const { OpenAI } = require('openai');
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-const cors = require('cors'); // This allows your HTML to talk to your Server
+const mongoose = require('mongoose');
+const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-app.use(express.static(__dirname));
+const PORT = process.env.PORT || 10000;
+
+// MIDDLEWARE - Crucial for reading your questions
+app.use(cors());
 app.use(express.json());
-app.use(cors()); // Enable communication between frontend and backend
+app.use(express.static(__dirname)); // This fixes the "Cannot GET /" error
 
-// 1. Setup AI Clients
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// MONGODB CONNECTION
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log("✅ Connected to MongoDB"))
+    .catch(err => console.error("❌ MongoDB Connection Error:", err));
 
-app.post('/ask-ai', async (req, res) => {
-    const { book, question } = req.body;
-
-    try {
-        // 2. Prepare the ChatGPT and Gemini requests
-        const gptPromise = openai.chat.completions.create({
-            model: "gpt-3.5-turbo",
-            messages: [{ role: "system", content: `You are an expert on the book ${book}.` }, 
-                       { role: "user", content: question }]
-        });
-
-        const geminiModel = genAI.getGenerativeModel({ model: "gemini-pro" });
-        const geminiPromise = geminiModel.generateContent(`Book: ${book}. Question: ${question}`);
-
-        // 3. Fire both at once!
-        const [gptResponse, geminiResponse] = await Promise.all([gptPromise, geminiPromise]);
-
-        res.json({
-            chatgpt: gptResponse.choices[0].message.content,
-            gemini: geminiResponse.response.text()
-        });
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "AI services failed to respond." });
-    }
+// DATABASE SCHEMA
+const HistorySchema = new mongoose.Schema({
+    question: String,
+    answer: String,
+    date: { type: Date, default: Date.now }
 });
+const History = mongoose.model('History', HistorySchema);
 
-const PORT = process.env.PORT || 3000;
+// ROUTES
+// 1. Serve the Home Page
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+// 2. Handle AI Question
+app.post('/ask-ai', async (req, res) => {
+    const { question } = req.body;
+    try {
+        // Simple mock response - replace with your OpenAI logic if needed
+        const aiAnswer = `Educato AI says: I received your question: "${question}"`;
+        
+        // Save to Database
+        const newHistory = new History({ question, answer: aiAnswer });
+        await newHistory.save();
+
+        res.json({ chatgpt: aiAnswer });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to process AI request" });
+    }
+});
+
+// 3. Get History
+app.get('/history', async (req, res) => {
+    const logs = await History.find().sort({ date: -1 });
+    res.json(logs);
+});
+
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+});
