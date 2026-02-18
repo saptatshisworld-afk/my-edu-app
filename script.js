@@ -45,22 +45,26 @@ async function askQuestion() {
 // 2. Function to load History from MongoDB
 async function loadHistory() {
     const historyList = document.getElementById('historyList');
-    if (!historyList) return; // Only run if the element exists
+    if (!historyList) return;
 
     try {
-        // Fixed: removed localhost so it works on the internet
         const response = await fetch('/history');
         const data = await response.json();
 
-        // Clear and map the data to the UI
-        historyList.innerHTML = data.map(item => `
-            <div style="background: #eee; padding: 10px; margin-bottom: 5px; border-radius: 5px;">
-                <strong>Q:</strong> ${item.question} <br>
-                <small>Answer saved to database.</small>
-            </div>
-        `).join('');
+        // Safety check: only map if data is an actual list (Array)
+        if (Array.isArray(data)) {
+            historyList.innerHTML = data.map(item => `
+                <div style="background: #f9f9f9; padding: 10px; margin-bottom: 8px; border-radius: 5px; border-left: 4px solid #007bff;">
+                    <strong>Q:</strong> ${item.question} <br>
+                    <small style="color: #666;">${new Date(item.date).toLocaleDateString()}</small>
+                </div>
+            `).join('');
+        } else {
+            historyList.innerHTML = "<p>No history yet. Ask a question!</p>";
+        }
     } catch (error) {
         console.error('Error loading history:', error);
+        historyList.innerHTML = "<p>Could not load history.</p>";
     }
 }
 

@@ -4,23 +4,20 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-// Render uses Port 10000 by default. This ensures it works on their servers.
 const PORT = process.env.PORT || 10000;
 
 // MIDDLEWARE
 app.use(cors());
 app.use(express.json());
-
-// THIS LINE IS THE FIX: It tells the server to serve your index.html and script.js
-app.use(express.static(__dirname)); 
+app.use(express.static(__dirname)); // Prevents "Cannot GET /"
 
 // MONGODB CONNECTION
-// Ensure process.env.MONGO_URI is set in your Render "Environment" tab
+// Ensure MONGO_URI is set in Render Environment tab
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log("✅ Connected to MongoDB"))
     .catch(err => console.error("❌ MongoDB Connection Error:", err));
 
-// DATABASE SCHEMA (For your history feature)
+// DATABASE SCHEMA
 const HistorySchema = new mongoose.Schema({
     question: String,
     answer: String,
@@ -29,36 +26,44 @@ const HistorySchema = new mongoose.Schema({
 const History = mongoose.model('History', HistorySchema);
 
 // ROUTES
-// 1. Home Route: Sends your HTML file when you visit the link
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
-// 2. AI Route: Handles the "Ask AI" button clicks
+// Handle AI Question
 app.post('/ask-ai', async (req, res) => {
-    const { question } = req.body;
     try {
-        // This is a placeholder response. Replace with your OpenAI/Google logic if needed.
-        const aiAnswer = `Educato AI Response for: "${question}"`;
+        const { question } = req.body;
         
-        // Save the interaction to MongoDB
-        const newHistory = new History({ question, answer: aiAnswer });
-        await newHistory.save();
+        if (!question) {
+            return res.status(400).json({ error: "No question provided" });
+        }
+
+        // Response logic
+        const aiAnswer = "Educato AI: I received your question: " + question;
+
+        // Save to DB (inside a try-catch so if DB fails, AI still answers)
+        try {
+            const newHistory = new History({ question, answer: aiAnswer });
+            await newHistory.save();
+        } catch (dbErr) {
+            console.error("DB Save Error:", dbErr);
+        }
 
         res.json({ chatgpt: aiAnswer });
     } catch (error) {
-        console.error("AI Route Error:", error);
-        res.status(500).json({ error: "Failed to process AI request" });
+        console.error("Server Error:", error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 });
 
-// 3. History Route: Loads saved questions
+// Get History
 app.get('/history', async (req, res) => {
     try {
         const logs = await History.find().sort({ date: -1 });
-        res.json(logs);
+        res.json(logs || []); // Always return an array to fix the .map() error
     } catch (error) {
-        res.status(500).json({ error: "Could not fetch history" });
+        res.status(500).json([]);
     }
 });
 
