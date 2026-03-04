@@ -49,8 +49,15 @@ async function loadHistory() {
 
     try {
         const response = await fetch('/history');
-        const data = await response.json();
-
+        const data = await response.json() 
+        // Check if user is Admin (You) or Premium
+        const premiumDiv = document.getElementById('premium-features');
+        if (premiumDiv && data) {
+            // Replace 'your-email@gmail.com' with your actual login email
+            if (data.isPremium === true || data.userEmail === 'your-email@gmail.com') {
+                premiumDiv.style.display = 'block';
+            }
+        }
         // Safety check: only map if data is an actual list (Array)
         if (Array.isArray(data)) {
             historyList.innerHTML = data.map(item => `
@@ -74,4 +81,16 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js')
     .then(() => console.log("Service Worker Registered"))
     .catch((err) => console.log("Service Worker Failed", err));
+}
+function openPdfUpload() {
+    // This creates a hidden file input and clicks it
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'application/pdf';
+    fileInput.onchange = e => {
+        const file = e.target.files[0];
+        console.log("Selected file:", file.name);
+        alert("Upload logic for " + file.name + " goes here!");
+    };
+    fileInput.click();
 }
