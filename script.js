@@ -50,13 +50,10 @@ async function loadHistory() {
     try {
         const response = await fetch('/history');
         const data = await response.json() 
-        // Check if user is Admin (You) or Premium
+        // Immediately show the Plus icon for the developer
         const premiumDiv = document.getElementById('premium-features');
-        if (premiumDiv && data) {
-            // Replace 'your-email@gmail.com' with your actual login email
-            if (data.isPremium === true || data.userEmail === 'your-email@gmail.com') {
-                premiumDiv.style.display = 'block';
-            }
+        if (premiumDiv) {
+            premiumDiv.style.display = 'block'; 
         }
         // Safety check: only map if data is an actual list (Array)
         if (Array.isArray(data)) {
@@ -76,11 +73,40 @@ async function loadHistory() {
 }
 
 // 3. Automatically load history when the page opens
-window.onload = loadHistory;
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js')
-    .then(() => console.log("Service Worker Registered"))
-    .catch((err) => console.log("Service Worker Failed", err));
+async function loadHistory() {
+    const historyList = document.getElementById('historyList');
+    const premiumDiv = document.getElementById('premium-features');
+    if (!historyList) return;
+
+    try {
+        const response = await fetch('/history');
+        const data = await response.json();
+
+        // FORCE SHOW for you specifically
+        // Change 'your-email@gmail.com' to your actual email address
+        if (premiumDiv) {
+            const myEmail = 'your-email@gmail.com'; 
+            if (data.userEmail === myEmail || data.isPremium === true) {
+                premiumDiv.style.display = 'block';
+            }
+        }
+
+        if (Array.isArray(data)) {
+            historyList.innerHTML = data.map(item => `
+                <div style="background: #f9f9f9; padding: 10px; margin-bottom: 8px; border-radius: 5px; border-left: 4px solid #007bff;">
+                    <strong>Q:</strong> ${item.question} <br>
+                    <small style="color: #666;">${new Date(item.date).toLocaleDateString()}</small>
+                </div>
+            `).join('');
+        } else {
+            historyList.innerHTML = "<p>No history yet. Ask a question!</p>";
+        }
+    } catch (error) {
+        console.error('Error loading history:', error);
+        // If the database is still acting up, let's still try to show the plus button for you
+        if (premiumDiv) premiumDiv.style.display = 'block'; 
+        historyList.innerHTML = "<p>Could not load history.</p>";
+    }
 }
 function openPdfUpload() {
     // This creates a hidden file input and clicks it
