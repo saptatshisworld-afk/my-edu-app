@@ -65,21 +65,34 @@ async function loadHistory() {
 }
 
 // 3. Function to handle PDF Upload (Triggered by the Plus button)
-function openPdfUpload() {
+async function openPdfUpload() {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = 'application/pdf';
-    fileInput.onchange = e => {
+
+    fileInput.onchange = async e => {
         const file = e.target.files[0];
-        if (file) {
-            alert("Uploading: " + file.name + ". (Backend logic coming next!)");
-            // You can add your fetch('/upload-pdf') logic here later
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('pdf', file);
+
+        // Tell the user the process has started
+        const resultBox = document.getElementById('result');
+        if (resultBox) resultBox.innerText = "Reading your book... please wait.";
+
+        try {
+            const response = await fetch('/upload-pdf', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            alert(result.message); // "Book 'read' successfully!"
+        } catch (error) {
+            console.error("Upload failed:", error);
+            alert("Upload failed. Check your connection.");
         }
     };
     fileInput.click();
 }
-
-// 4. Initialize app on load
-window.onload = () => {
-    loadHistory();
-};

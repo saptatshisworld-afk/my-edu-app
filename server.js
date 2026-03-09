@@ -1,3 +1,55 @@
+// This variable acts as the AI's "Temporary Memory" for the book
+let currentBookText = ""; 
+
+app.post('/ask-ai', async (req, res) => {
+    const multer = require('multer');
+const pdfParse = require('pdf-parse');
+const upload = multer({ storage: multer.memoryStorage() });
+
+// Route to handle PDF Upload
+app.post('/upload-pdf', upload.single('pdf'), async (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    try {
+        // This converts the PDF data into text
+        const data = await pdfParse(req.file.buffer);
+        
+        // We save the text into the variable we created!
+        currentBookContext = data.text; 
+
+        console.log("PDF Text Extracted Successfully");
+        res.json({ message: "Book 'read' successfully! You can now ask questions about it." });
+    } catch (err) {
+        console.error("PDF Parsing Error:", err);
+        res.status(500).json({ error: "Failed to read the PDF content." });
+    }
+});
+    const { question } = req.body;
+    
+    // We create a "System Prompt" that tells the AI to use your book
+    const contextPrompt = currentBookText 
+        ? `Use the following book content to answer the question: ${currentBookText}\n\nQuestion: ${question}`
+        : question; // If no book is uploaded, it just answers normally
+
+    try {
+        // This is where you call your AI API (like OpenAI or Gemini)
+        const aiResponse = await callYourAIAPI(contextPrompt); 
+        
+        // Save the interaction to MongoDB so it shows in your history
+        const newHistory = new History({ 
+            question: question, 
+            answer: aiResponse,
+            userEmail: "saptatshisworld@gmail.com" 
+        });
+        await newHistory.save();
+
+        res.json({ chatgpt: aiResponse });
+    } catch (err) {
+        res.status(500).json({ error: "AI failed to process" });
+    }
+});
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
@@ -87,4 +139,19 @@ app.post('/ask-ai', async (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
+});
+const pdf = require('pdf-parse');
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage() });
+
+let bookContext = ""; // This holds the "knowledge" from your PDF
+
+app.post('/upload-pdf', upload.single('pdf'), async (req, res) => {
+    try {
+        const data = await pdf(req.file.buffer);
+        bookContext = data.text; // Store the text from the PDF
+        res.json({ message: "Book uploaded! AI is now ready to answer questions about it." });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to read PDF" });
+    }
 });
