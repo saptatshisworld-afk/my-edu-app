@@ -1,15 +1,13 @@
-// 1. Function to ask a question to the AI
+// 1. Ask AI Function
 async function askQuestion() {
     const questionElement = document.getElementById('question');
     const resultBox = document.getElementById('result');
     const question = questionElement.value;
 
-    if (!question) {
-        alert("Please enter a question!");
-        return;
-    }
+    if (!question) return;
 
-    resultBox.innerText = "Thinking...";
+    resultBox.innerHTML += `<p><strong>You:</strong> ${question}</p>`;
+    questionElement.value = '';
 
     try {
         const response = await fetch('/ask-ai', {
@@ -19,80 +17,55 @@ async function askQuestion() {
         });
 
         const data = await response.json();
-        resultBox.innerText = data.chatgpt;
-        
-        // Refresh history after asking
-        loadHistory(); 
+        resultBox.innerHTML += `<p style="color:#f39c12;"><strong>EDUCAT:</strong> ${data.chatgpt}</p>`;
+        resultBox.scrollTop = resultBox.scrollHeight;
     } catch (error) {
-        console.error('Error:', error);
-        resultBox.innerText = "Error: Could not reach the server. Make sure your Render app is Live.";
+        resultBox.innerHTML += `<p style="color:red;">Error connecting to server.</p>`;
     }
 }
 
-// 2. Function to load History from MongoDB
+// 2. Menu Toggles
+function toggleHistory() {
+    const sidebar = document.getElementById('history-sidebar');
+    sidebar.classList.toggle('active');
+    if (sidebar.classList.contains('active')) loadHistory();
+}
+
+function togglePremiumMenu() {
+    const menu = document.getElementById('premium-dropdown');
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+}
+
+// 3. Load History from MongoDB
 async function loadHistory() {
     const historyList = document.getElementById('historyList');
-    const premiumDiv = document.getElementById('premium-features');
-
-    // --- IMMEDIATE ADMIN CHECK ---
-    // This ensures the Plus icon shows up for you right away
-    if (premiumDiv) {
-        premiumDiv.style.display = 'block'; 
-        console.log("Admin access granted: Plus icon visible.");
-    }
-
-    if (!historyList) return;
-
     try {
         const response = await fetch('/history');
         const data = await response.json();
-
-        // Safety check: only map if data is an actual list (Array)
         if (Array.isArray(data)) {
             historyList.innerHTML = data.map(item => `
-                <div style="background: #f9f9f9; padding: 10px; margin-bottom: 8px; border-radius: 5px; border-left: 4px solid #007bff;">
-                    <strong>Q:</strong> ${item.question} <br>
-                    <small style="color: #666;">${new Date(item.date).toLocaleDateString()}</small>
+                <div style="border-bottom:1px solid #eee; padding:10px 0;">
+                    <small>${new Date(item.date).toLocaleDateString()}</small><br>
+                    <strong>Q:</strong> ${item.question}
                 </div>
             `).join('');
-        } else {
-            historyList.innerHTML = "<p>No history yet. Ask a question!</p>";
         }
-    } catch (error) {
-        console.error('Error loading history:', error);
-        historyList.innerHTML = "<p>Database connection is waking up... try again in a moment.</p>";
-    }
+    } catch (e) { console.log("History error"); }
 }
 
-// 3. Function to handle PDF Upload (Triggered by the Plus button)
+// 4. PDF Upload
 async function openPdfUpload() {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = 'application/pdf';
-
     fileInput.onchange = async e => {
         const file = e.target.files[0];
         if (!file) return;
-
         const formData = new FormData();
         formData.append('pdf', file);
-
-        // Tell the user the process has started
-        const resultBox = document.getElementById('result');
-        if (resultBox) resultBox.innerText = "Reading your book... please wait.";
-
-        try {
-            const response = await fetch('/upload-pdf', {
-                method: 'POST',
-                body: formData
-            });
-
-            const result = await response.json();
-            alert(result.message); // "Book 'read' successfully!"
-        } catch (error) {
-            console.error("Upload failed:", error);
-            alert("Upload failed. Check your connection.");
-        }
+        alert("Reading book...");
+        await fetch('/upload-pdf', { method: 'POST', body: formData });
+        alert("Book ready!");
     };
     fileInput.click();
 }

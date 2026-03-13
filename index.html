@@ -3,58 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Educato - AI Study Partner</title>
+    <title>EDUCAT - AI Partner</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="wrapper">
-        <header>
-            <h1>Educato</h1>
+    <div class="app-container">
+        <header class="main-header">
+            <div class="header-left">
+                <h1>EDUCAT</h1>
+                <button class="icon-btn arrow-btn" onclick="togglePremiumMenu()">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+            
+            <button class="icon-btn dots-btn" onclick="toggleHistory()">
+                <i class="fas fa-ellipsis-v"></i>
+            </button>
         </header>
 
-        <main>
-            <div class="portal-container">
-                <div class="portal-header">
-                    <h2><i class="fas fa-graduation-cap"></i> Educato Portal</h2>
-                    <p class="account-type">FREE ACCOUNT</p>
+        <div id="premium-dropdown" class="dropdown-menu">
+            <button class="upgrade-btn">Update to Premium</button>
+        </div>
+
+        <main class="chat-area">
+            <div id="result" class="response-display">
                 </div>
 
-                <div class="input-group">
-                    <label for="book-select">Choose Book</label>
-                    <select id="book-select">
-                        <option>Physics: Fundamentals</option>
-                    </select>
-                </div>
-
-                <div class="input-group">
-                    <label for="question">Your Question</label>
-                    <textarea id="question" placeholder="Type your question here..."></textarea>
-                </div>
-
-                <button class="ask-btn" onclick="askQuestion()">Ask AI (Instant)</button>
-
-                <div id="result" class="result-box"></div>
-
-                <div class="upsell-card">
-                    <p>Unlock Human Experts & Unlimited AI</p>
-                    <button class="pay-btn">Pay $1 with GPay</button>
-                </div>
-            </div>
-
-            <div class="history-container">
-                <div id="premium-features" style="display: none; text-align: right; margin-bottom: 10px;">
-                    <button onclick="openPdfUpload()" style="background:#28a745; color:white; border:none; border-radius:50%; width:35px; height:35px; cursor:pointer; font-weight:bold; font-size: 20px;">
-                        +
+            <div class="input-section">
+                <div class="orange-input-wrapper">
+                    <button class="plus-btn" onclick="openPdfUpload()">+</button>
+                    <textarea id="question" placeholder="Tell me"></textarea>
+                    <button class="send-btn" onclick="askQuestion()">
+                        <i class="fas fa-arrow-up"></i>
                     </button>
                 </div>
-
-                <h3><i class="far fa-clock"></i> Recent Questions</h3>
-                <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 15px;">
-                
-                <div id="historyList">Loading memory...</div>
+                <p class="branding">Powered by : TEAM SMGS</p>
             </div>
         </main>
+
+        <div id="history-sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>Recent History</h3>
+                <button onclick="toggleHistory()" class="close-btn">&times;</button>
+            </div>
+            <div id="historyList">Loading...</div>
+        </div>
     </div>
 
     <script src="script.js"></script>
