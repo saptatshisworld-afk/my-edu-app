@@ -1,3 +1,8 @@
+// Line 1: Initialization for Mobile/Desktop
+window.onload = () => {
+    console.log("EDUCATO UI Initialized");
+    loadHistory(); 
+};
 // 1. Ask AI Function
 async function askQuestion() {
     const questionElement = document.getElementById('question');
@@ -23,7 +28,27 @@ async function askQuestion() {
         resultBox.innerHTML += `<p style="color:red;">Error connecting to server.</p>`;
     }
 }
+// 1. Ask AI Function
+async function askQuestion() {
+    // ... (your existing code from Screenshot 86)
+}
 
+// 2. Menu Toggles (Add these now!)
+function togglePremiumMenu() {
+    const menu = document.getElementById('premium-dropdown');
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+}
+
+function toggleHistory() {
+    const sidebar = document.getElementById('history-sidebar');
+    sidebar.classList.toggle('active'); 
+    if (sidebar.classList.contains('active')) loadHistory();
+}
+
+// 3. Load History Function
+async function loadHistory() {
+    // ... (your code to fetch from MongoDB)
+}
 // 2. Menu Toggles
 function toggleHistory() {
     const sidebar = document.getElementById('history-sidebar');
