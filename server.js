@@ -1,108 +1,84 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const path = require('path');
 const cors = require('cors');
-const multer = require('multer');
-const pdfParse = require('pdf-parse');
-require('dotenv').config();
+const path = require('path');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+const OpenAI = require("openai");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-const upload = multer({ storage: multer.memoryStorage() });
 
-let currentBookContext = ""; 
-
+// --- CONFIGURATION ---
 app.use(express.json());
 app.use(cors());
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, '/')));
 
-// MongoDB Connection
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => {
-        console.log("✅ Connected to MongoDB Atlas");
-        initKnowledge(); 
-    })
-    .catch(err => console.error("❌ MongoDB Connection Error:", err));
+// Initialize AI Clients using your Render Environment Variables
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// Data Schemas
+// --- MONGODB CONNECTION ---
+mongoose.connect(process.env.MONGO_URI || 'your_fallback_mongodb_uri')
+    .then(() => console.log("Connected to MongoDB Atlas"))
+    .catch(err => console.error("MongoDB Error:", err));
+
 const historySchema = new mongoose.Schema({
     question: String,
-    answer: String,
-    userEmail: String,
+    chatgpt: String, // Keeping the name 'chatgpt' to match your frontend logic
     date: { type: Date, default: Date.now }
 });
 
-const bookSchema = new mongoose.Schema({
-    title: String,
-    content: String,
-    userEmail: String,
-    uploadDate: { type: Date, default: Date.now }
-});
-
 const History = mongoose.model('History', historySchema);
-const Book = mongoose.model('Book', bookSchema);
 
-// Admin Route
-app.get('/admin.html', (req, res) => {
-    if (req.query.pass === "MySecretAdmin2026") {
-        res.sendFile(path.join(__dirname, 'admin.html'));
-    } else {
-        res.status(403).send("Access Denied");
-    }
-});
+// --- ROUTES ---
 
-// PDF Upload Route
-app.post('/upload-pdf', upload.single('pdf'), async (req, res) => {
-    try {
-        const data = await pdfParse(req.file.buffer);
-        const newBook = new Book({
-            title: req.file.originalname,
-            content: data.text,
-            userEmail: "saptatshisworld@gmail.com"
-        });
-        await newBook.save();
-        currentBookContext = data.text; 
-        res.json({ message: "Book saved and 'read' successfully!" });
-    } catch (err) {
-        res.status(500).json({ error: "Failed to process PDF" });
-    }
-});
-
-// Ask AI Route
+// 1. AI Question Route
 app.post('/ask-ai', async (req, res) => {
     const { question } = req.body;
-    const finalPrompt = currentBookContext 
-        ? `Context: ${currentBookContext}\n\nQuestion: ${question}`
-        : question;
+    if (!question) return res.status(400).json({ error: "No question provided" });
 
     try {
-        const aiResponse = "Based on the book: " + question + " is explained as...";
-        const newHistory = new History({ 
-            question, 
-            answer: aiResponse, 
-            userEmail: "saptatshisworld@gmail.com" 
+        // --- CHOICE A: GOOGLE GEMINI (Active) ---
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const result = await model.generateContent(question);
+        const aiResponse = result.response.text();
+
+        /* // --- CHOICE B: OPENAI CHATGPT (Uncomment to use instead) ---
+        const completion = await openai.chat.completions.create({
+            messages: [{ role: "user", content: question }],
+            model: "gpt-4o-mini",
+        });
+        const aiResponse = completion.choices[0].message.content;
+        */
+
+        // Save to Database
+        const newHistory = new History({
+            question: question,
+            chatgpt: aiResponse 
         });
         await newHistory.save();
+
         res.json({ chatgpt: aiResponse });
-    } catch (err) {
-        res.status(500).json({ error: "AI Error" });
+
+    } catch (error) {
+        console.error("AI Error:", error.message);
+        res.status(500).json({ chatgpt: "Error: Make sure your API keys are set in Render Environment Variables!" });
     }
 });
 
+// 2. History Fetch Route
 app.get('/history', async (req, res) => {
     try {
-        const histories = await History.find().sort({ date: -1 });
-        res.json(histories);
+        const data = await History.find().sort({ date: -1 }).limit(10);
+        res.json(data);
     } catch (err) {
-        res.status(500).json({ error: "History Error" });
+        res.status(500).send(err);
     }
 });
 
-async function initKnowledge() {
-    try {
-        const latestBook = await Book.findOne().sort({ uploadDate: -1 });
-        if (latestBook) currentBookContext = latestBook.content;
-    } catch (err) { console.log("No previous books."); }
-}
+// 3. Serve Frontend
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
-app.listen(PORT, () => console.log(`🚀 Server on port ${PORT}`));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`EDUCATO Server running on port ${PORT}`));
