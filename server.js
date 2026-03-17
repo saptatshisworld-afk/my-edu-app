@@ -33,7 +33,7 @@ app.post('/ask-ai', async (req, res) => {
     const { question } = req.body;
     try {
         // --- USING GEMINI (Fast & Free Tier) ---
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
         const result = await model.generateContent(question);
         const aiResponse = result.response.text();
 
