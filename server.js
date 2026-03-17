@@ -7,78 +7,54 @@ const OpenAI = require("openai");
 
 const app = express();
 
-// --- CONFIGURATION ---
+// Middleware
 app.use(express.json());
 app.use(cors());
 app.use(express.static(path.join(__dirname, '/')));
 
-// Initialize AI Clients using your Render Environment Variables
+// Initialize AI Clients using Render Environment Variables
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// --- MONGODB CONNECTION ---
-mongoose.connect(process.env.MONGO_URI || 'your_fallback_mongodb_uri')
+// MongoDB Connection
+mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log("Connected to MongoDB Atlas"))
     .catch(err => console.error("MongoDB Error:", err));
 
 const historySchema = new mongoose.Schema({
     question: String,
-    chatgpt: String, // Keeping the name 'chatgpt' to match your frontend logic
+    chatgpt: String, 
     date: { type: Date, default: Date.now }
 });
-
 const History = mongoose.model('History', historySchema);
 
-// --- ROUTES ---
-
-// 1. AI Question Route
+// AI Question Route
 app.post('/ask-ai', async (req, res) => {
     const { question } = req.body;
-    if (!question) return res.status(400).json({ error: "No question provided" });
-
     try {
-        // --- CHOICE A: GOOGLE GEMINI (Active) ---
+        // --- USING GEMINI (Fast & Free Tier) ---
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         const result = await model.generateContent(question);
         const aiResponse = result.response.text();
 
-        /* // --- CHOICE B: OPENAI CHATGPT (Uncomment to use instead) ---
-        const completion = await openai.chat.completions.create({
-            messages: [{ role: "user", content: question }],
-            model: "gpt-4o-mini",
-        });
-        const aiResponse = completion.choices[0].message.content;
-        */
-
-        // Save to Database
-        const newHistory = new History({
-            question: question,
-            chatgpt: aiResponse 
-        });
+        // Save to MongoDB
+        const newHistory = new History({ question, chatgpt: aiResponse });
         await newHistory.save();
 
         res.json({ chatgpt: aiResponse });
-
     } catch (error) {
-        console.error("AI Error:", error.message);
-        res.status(500).json({ chatgpt: "Error: Make sure your API keys are set in Render Environment Variables!" });
+        console.error("AI Error:", error);
+        res.status(500).json({ chatgpt: "I'm having trouble connecting to the AI. Check your API keys in Render!" });
     }
 });
 
-// 2. History Fetch Route
+// History Route
 app.get('/history', async (req, res) => {
-    try {
-        const data = await History.find().sort({ date: -1 }).limit(10);
-        res.json(data);
-    } catch (err) {
-        res.status(500).send(err);
-    }
+    const data = await History.find().sort({ date: -1 }).limit(10);
+    res.json(data);
 });
 
-// 3. Serve Frontend
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`EDUCATO Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
