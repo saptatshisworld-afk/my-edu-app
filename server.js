@@ -3,58 +3,53 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-const OpenAI = require("openai");
 
 const app = express();
-
-// Middleware
 app.use(express.json());
 app.use(cors());
 app.use(express.static(path.join(__dirname, '/')));
 
-// Initialize AI Clients using Render Environment Variables
+// Initialize Gemini 2.5 Flash
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// MongoDB Connection
+// MongoDB
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log("Connected to MongoDB Atlas"))
-    .catch(err => console.error("MongoDB Error:", err));
+    .then(() => console.log("MongoDB Connected"))
+    .catch(err => console.log("DB Error:", err));
 
-const historySchema = new mongoose.Schema({
+const History = mongoose.model('History', new mongoose.Schema({
     question: String,
-    chatgpt: String, 
+    chatgpt: String,
     date: { type: Date, default: Date.now }
-});
-const History = mongoose.model('History', historySchema);
+}));
 
-// AI Question Route
+// AI Route
 app.post('/ask-ai', async (req, res) => {
-    const { question } = req.body;
     try {
-        // --- USING GEMINI (Fast & Free Tier) ---
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-        const result = await model.generateContent(question);
-        const aiResponse = result.response.text();
+        const result = await model.generateContent(req.body.question);
+        const responseText = result.response.text();
 
-        // Save to MongoDB
-        const newHistory = new History({ question, chatgpt: aiResponse });
-        await newHistory.save();
-
-        res.json({ chatgpt: aiResponse });
+        await new History({ question: req.body.question, chatgpt: responseText }).save();
+        res.json({ chatgpt: responseText });
     } catch (error) {
-        console.error("AI Error:", error);
-        res.status(500).json({ chatgpt: "I'm having trouble connecting to the AI. Check your API keys in Render!" });
+        console.error(error);
+        res.status(500).json({ chatgpt: "AI failed. Check your Gemini Key in Render." });
     }
 });
 
-// History Route
+// History Routes
 app.get('/history', async (req, res) => {
     const data = await History.find().sort({ date: -1 }).limit(10);
     res.json(data);
 });
 
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.delete('/clear-history', async (req, res) => {
+    await History.deleteMany({});
+    res.sendStatus(200);
+});
+
+app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`EDUCATO running on port ${PORT}`));
