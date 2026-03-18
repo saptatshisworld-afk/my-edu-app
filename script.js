@@ -57,3 +57,19 @@ async function clearChat() {
         loadHistory();
     }
 }
+// Function to trigger the hidden file input
+function openPdfUpload() {
+    document.getElementById('pdf-input').click();
+}
+
+// Function to handle the selected file
+async function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const resBox = document.getElementById('result');
+    resBox.innerHTML += `<div class="user-q"><b>Uploaded:</b> ${file.name}</div>`;
+
+    // For now, we show a "Processing" message
+    resBox.innerHTML += `<div class="ai-res"><b>EDUCATO:</b> I see your file "${file.name}". (Note: Backend PDF parsing required to read content).</div>`;
+}
