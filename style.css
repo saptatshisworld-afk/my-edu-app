@@ -1,48 +1,71 @@
-/* --- RESET --- */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-body, html {
-    height: 100%;
-    width: 100%;
-    font-family: 'Segoe UI', sans-serif;
-    overflow: hidden; /* Prevent body scroll */
-    display: flex;
-    flex-direction: column;
+/* --- 1. GLOBAL RESET --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-/* --- MAIN CONTAINER --- */
+body, html {
+    height: 100vh;
+    width: 100vw;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #ffffff;
+    overflow: hidden; /* Prevents the whole screen from scrolling */
+}
+
+/* --- 2. MAIN LAYOUT --- */
 .app-container {
     display: flex;
     flex-direction: column;
-    height: 100vh; /* Full viewport height */
+    height: 100vh;
+    position: relative;
 }
 
-/* --- HEADER --- */
+/* --- 3. HEADER --- */
 .main-header {
-    flex-shrink: 0; /* Header won't shrink */
+    flex-shrink: 0; /* Keeps header fixed height */
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 15px 25px;
     border-bottom: 1px solid #f0f0f0;
     background: #fff;
+    z-index: 10;
 }
 
-.header-left { display: flex; align-items: center; gap: 8px; }
-h1 { font-size: 24px; letter-spacing: 2px; color: #333; }
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
-/* --- CHAT AREA (THIS PART IS THE KEY) --- */
+h1 {
+    font-size: 24px;
+    letter-spacing: 2px;
+    color: #333;
+    font-weight: bold;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #666;
+}
+
+/* --- 4. CHAT AREA & MESSAGES --- */
 .chat-area {
-    flex: 1; /* Grows to fill ALL available space */
+    flex: 1; /* Fills all space between header and footer */
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* Scroll happens inside response-display */
-    background-color: #ffffff;
+    overflow: hidden;
+    background-color: #fff;
 }
 
 .response-display {
-    flex: 1; /* Fills the chat-area */
-    overflow-y: auto;
+    flex: 1;
+    overflow-y: auto; /* Only messages scroll */
     padding: 20px;
     width: 100%;
     max-width: 800px;
@@ -51,13 +74,31 @@ h1 { font-size: 24px; letter-spacing: 2px; color: #333; }
     flex-direction: column;
 }
 
-/* --- INPUT SECTION (LOCKED TO BOTTOM) --- */
+.user-q {
+    align-self: flex-end;
+    background: #f1f1f1;
+    padding: 12px 18px;
+    border-radius: 15px 15px 0 15px;
+    margin: 10px 0;
+    max-width: 80%;
+}
+
+.ai-res {
+    align-self: flex-start;
+    color: #f39c12; /* Brand orange color */
+    padding: 10px;
+    margin: 10px 0;
+    line-height: 1.6;
+    max-width: 90%;
+}
+
+/* --- 5. INPUT BAR (LOCKED TO BOTTOM) --- */
 .input-section {
-    flex-shrink: 0; /* Stays at the bottom */
-    padding: 20px;
+    flex-shrink: 0;
+    padding: 15px 20px;
     background: #fff;
-    width: 100%;
-    position: relative;
+    border-top: 1px solid #f0f0f0;
+    z-index: 10;
 }
 
 .orange-input-wrapper {
@@ -75,36 +116,112 @@ textarea {
     border: none;
     outline: none;
     resize: none;
-    height: 45px;
+    height: 40px;
     font-size: 16px;
-    padding: 12px 0;
+    padding: 10px 0;
+    background: transparent;
 }
 
-/* --- BUTTONS --- */
-.plus-btn { font-size: 30px; color: #f39c12; background: none; border: none; cursor: pointer; margin-right: 15px; }
-.send-btn { color: #f39c12; background: none; border: 2px solid #f39c12; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; }
+.plus-btn {
+    font-size: 30px;
+    color: #f39c12;
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-right: 15px;
+}
 
-/* --- POPUP MENU --- */
+.send-btn {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: 2px solid #f39c12;
+    color: #f39c12;
+    background: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- 6. SIDEBAR (FIXED OVERLAY) --- */
+.sidebar {
+    position: fixed; /* Takes it out of the bottom list flow */
+    right: -320px; /* Hidden off-screen */
+    top: 0;
+    width: 300px;
+    height: 100vh;
+    background: white;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+    transition: 0.3s ease-in-out;
+    z-index: 9999; /* Higher than everything else */
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar.active {
+    right: 0; /* Slides in when active class is added */
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #f39c12;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+
+.clear-btn {
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* --- 7. POPUP MENU --- */
 .plus-popup-menu {
     display: none;
     position: absolute;
-    bottom: 85px;
+    bottom: 90px;
     left: 50%;
     transform: translateX(-50%);
     background: white;
     border: 2px solid #f39c12;
     border-radius: 15px;
     width: 200px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    z-index: 1000;
-    flex-direction: column;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    z-index: 100;
 }
 
 .plus-popup-menu button {
-    background: none; border: none; padding: 12px; text-align: left;
-    width: 100%; cursor: pointer; border-bottom: 1px solid #eee;
-    display: flex; align-items: center; gap: 10px;
+    background: none;
+    border: none;
+    padding: 12px 15px;
+    text-align: left;
+    width: 100%;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-/* --- BRANDING --- */
-.branding { text-align: center; font-size: 11px; color: #ccc; margin-top: 10px; }
+.plus-popup-menu button i { color: #f39c12; width: 20px; }
+.plus-popup-menu button:hover { background: #fffcf5; }
+
+/* --- 8. UTILITIES --- */
+.branding {
+    text-align: center;
+    font-size: 11px;
+    color: #ccc;
+    margin-top: 8px;
+}
+
+@media (max-width: 600px) {
+    .orange-input-wrapper { width: 95%; }
+    .sidebar { width: 85%; }
+}
