@@ -27,9 +27,20 @@
 
         <main class="chat-area">
             <div id="result" class="response-display"></div>
+            
             <div class="input-section">
+                <div id="plus-menu" class="plus-popup-menu">
+                    <button onclick="openCamera()"><i class="fas fa-camera"></i> Camera</button>
+                    <button onclick="openFiles()"><i class="fas fa-folder"></i> Files</button>
+                    <button onclick="openFiles()"><i class="fas fa-image"></i> Photos</button>
+                    <button onclick="startStudy()"><i class="fas fa-book-reader"></i> Study & Learn</button>
+                    <button onclick="openFiles()"><i class="fas fa-file-pdf"></i> Upload PDF</button>
+                    <button onclick="startQuiz()"><i class="fas fa-question-circle"></i> Quizzes</button>
+                    <button onclick="createImagePrompt()"><i class="fas fa-paint-brush"></i> Create Image</button>
+                </div>
+
                 <div class="orange-input-wrapper">
-                    <button class="plus-btn" onclick="openPdfUpload()">+</button>
+                    <button class="plus-btn" onclick="togglePlusMenu(event)">+</button>
                     <textarea id="question" placeholder="Tell me"></textarea>
                     <button class="send-btn" onclick="askQuestion()">
                         <i class="fas fa-arrow-up"></i>
@@ -47,10 +58,12 @@
                     <button onclick="toggleHistory()" class="close-btn">&times;</button>
                 </div>
             </div>
-            <div id="historyList">Loading history...</div>
+            <div id="historyList"></div>
         </div>
     </div>
+
+    <input type="file" id="pdf-input" style="display: none;" onchange="handleFileUpload(event)">
+
     <script src="script.js"></script>
-    <input type="file" id="pdf-input" style="display: none;" accept=".pdf,.doc,.docx,.txt" onchange="handleFileUpload(event)">
 </body>
 </html>

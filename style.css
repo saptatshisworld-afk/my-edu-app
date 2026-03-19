@@ -1,47 +1,60 @@
 body, html {
     margin: 0; padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', sans-serif;
     height: 100%; background-color: #fff;
 }
-.app-container { display: flex; flex-direction: column; height: 100vh; }
+.app-container { display: flex; flex-direction: column; height: 100vh; position: relative; }
 
 /* Header */
 .main-header {
     display: flex; justify-content: space-between; align-items: center;
     padding: 15px 25px; border-bottom: 1px solid #f0f0f0;
 }
-h1 { font-size: 22px; letter-spacing: 3px; margin: 0; color: #333; font-weight: bold; }
+h1 { font-size: 22px; letter-spacing: 3px; margin: 0; color: #333; }
 .icon-btn { background: none; border: none; font-size: 18px; cursor: pointer; color: #666; }
 
-/* Chat Area */
-.chat-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-.response-display { flex: 1; padding: 20px; overflow-y: auto; max-width: 800px; margin: 0 auto; width: 100%; }
-.user-q { text-align: right; background: #f9f9f9; padding: 10px; border-radius: 10px; margin: 10px 0; }
-.ai-res { text-align: left; color: #f39c12; padding: 10px; margin: 10px 0; line-height: 1.6; }
+/* Plus Popup Menu */
+.plus-popup-menu {
+    display: none;
+    position: absolute;
+    bottom: 100px;
+    left: 30px;
+    background: white;
+    border: 2px solid #f39c12;
+    border-radius: 15px;
+    width: 180px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    z-index: 1000;
+    flex-direction: column;
+}
+.plus-popup-menu button {
+    background: none; border: none; padding: 12px; text-align: left;
+    width: 100%; cursor: pointer; font-size: 14px; border-bottom: 1px solid #eee;
+    display: flex; align-items: center; gap: 10px;
+}
+.plus-popup-menu button i { color: #f39c12; width: 20px; }
+.plus-popup-menu button:hover { background: #fffcf5; }
 
-/* Orange Input Box */
-.input-section { padding: 20px; background: white; }
+/* Orange Input Wrapper */
+.input-section { padding: 20px; position: relative; }
 .orange-input-wrapper {
     border: 2px solid #f39c12; border-radius: 30px;
     display: flex; align-items: center; padding: 10px 20px;
-    max-width: 700px; margin: 0 auto;
+    max-width: 800px; margin: 0 auto; background: white;
 }
 textarea { flex: 1; border: none; outline: none; resize: none; height: 25px; font-size: 16px; }
 .plus-btn { font-size: 28px; color: #f39c12; background: none; border: none; cursor: pointer; margin-right: 15px; }
 .send-btn { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #f39c12; color: #f39c12; background: none; cursor: pointer; }
 
+/* Response Display */
+.response-display { flex: 1; padding: 20px; overflow-y: auto; }
+.ai-res { color: #f39c12; margin: 15px 0; line-height: 1.5; }
+.user-q { background: #f9f9f9; padding: 10px; border-radius: 10px; margin: 10px 0; text-align: right; }
+
 /* Sidebar */
 .sidebar {
     position: fixed; right: -350px; top: 0; width: 300px; height: 100%;
-    background: white; shadow: -5px 0 15px rgba(0,0,0,0.1); transition: 0.3s; z-index: 100; padding: 20px;
+    background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.1); transition: 0.3s; z-index: 1001; padding: 20px;
 }
 .sidebar.active { right: 0; }
-.sidebar-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-.clear-btn { background: #ff4d4d; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
 .branding { text-align: center; font-size: 11px; color: #bbb; margin-top: 8px; }
-
-/* Mobile */
-@media (max-width: 600px) {
-    .orange-input-wrapper { width: 95%; }
-    .sidebar { width: 85%; }
-}

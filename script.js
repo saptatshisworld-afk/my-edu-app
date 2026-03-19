@@ -1,8 +1,46 @@
-window.onload = () => {
-    console.log("EDUCATO initialized");
-    loadHistory();
-};
+// Force init on load
+window.onload = () => { loadHistory(); };
 
+// Toggle the 7-option menu
+function togglePlusMenu(event) {
+    event.stopPropagation();
+    const menu = document.getElementById('plus-menu');
+    menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
+}
+
+// 1. Camera
+function openCamera() {
+    const input = document.getElementById('pdf-input');
+    input.setAttribute('capture', 'camera');
+    input.setAttribute('accept', 'image/*');
+    input.click();
+}
+
+// 2, 3, 5. Files / Photos / PDF
+function openFiles() {
+    const input = document.getElementById('pdf-input');
+    input.removeAttribute('capture');
+    input.setAttribute('accept', '.pdf,.doc,.docx,.jpg,.png');
+    input.click();
+}
+
+// Handling File Selection
+function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (file) {
+        document.getElementById('result').innerHTML += `<div class="user-q"><b>Uploaded:</b> ${file.name}</div>`;
+        // Trigger your backend upload logic here
+    }
+}
+
+// 4. Study & Learn / 6. Quizzes / 7. Create Image
+function startStudy() { alert("Starting Study Mode..."); }
+function startQuiz() { alert("Generating Quiz..."); }
+function createImagePrompt() { 
+    document.getElementById('question').value = "Create an image of: "; 
+}
+
+// AI Question logic
 async function askQuestion() {
     const qInput = document.getElementById('question');
     const resBox = document.getElementById('result');
@@ -11,7 +49,6 @@ async function askQuestion() {
 
     resBox.innerHTML += `<div class="user-q"><b>You:</b> ${q}</div>`;
     qInput.value = '';
-    resBox.scrollTop = resBox.scrollHeight;
 
     try {
         const res = await fetch('/ask-ai', {
@@ -22,54 +59,17 @@ async function askQuestion() {
         const data = await res.json();
         resBox.innerHTML += `<div class="ai-res"><b>EDUCATO:</b> ${data.chatgpt}</div>`;
     } catch (err) {
-        resBox.innerHTML += `<div class="ai-res" style="color:red;">Server connection error.</div>`;
+        resBox.innerHTML += `<div class="ai-res" style="color:red;">Error connecting to server.</div>`;
     }
     resBox.scrollTop = resBox.scrollHeight;
 }
 
-function toggleHistory() {
-    document.getElementById('history-sidebar').classList.toggle('active');
-    loadHistory();
-}
-
+// UI Toggles
+function toggleHistory() { document.getElementById('history-sidebar').classList.toggle('active'); }
 function togglePremiumMenu() {
     const m = document.getElementById('premium-dropdown');
     m.style.display = m.style.display === 'block' ? 'none' : 'block';
 }
 
-async function loadHistory() {
-    const list = document.getElementById('historyList');
-    try {
-        const res = await fetch('/history');
-        const data = await res.json();
-        list.innerHTML = data.map(i => `
-            <div style="font-size:13px; margin-bottom:10px; border-bottom:1px solid #f9f9f9;">
-                <strong>Q:</strong> ${i.question.substring(0,30)}...
-            </div>
-        `).join('');
-    } catch (e) { list.innerHTML = "No history found."; }
-}
-
-async function clearChat() {
-    if (confirm("Delete all history?")) {
-        await fetch('/clear-history', { method: 'DELETE' });
-        document.getElementById('result').innerHTML = '';
-        loadHistory();
-    }
-}
-// Function to trigger the hidden file input
-function openPdfUpload() {
-    document.getElementById('pdf-input').click();
-}
-
-// Function to handle the selected file
-async function handleFileUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const resBox = document.getElementById('result');
-    resBox.innerHTML += `<div class="user-q"><b>Uploaded:</b> ${file.name}</div>`;
-
-    // For now, we show a "Processing" message
-    resBox.innerHTML += `<div class="ai-res"><b>EDUCATO:</b> I see your file "${file.name}". (Note: Backend PDF parsing required to read content).</div>`;
-}
+// Close menu on outside click
+window.onclick = () => { document.getElementById('plus-menu').style.display = 'none'; };
