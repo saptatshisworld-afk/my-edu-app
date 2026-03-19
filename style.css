@@ -1,142 +1,63 @@
-/* --- RESET & BASE --- */
-* {
-    box-sizing: border-box;
-}
+/* --- RESET --- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body, html {
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    height: 100vh;
-    width: 100vw;
-    background-color: #ffffff;
-    overflow: hidden; /* Stops the whole page from scrolling */
+    height: 100%;
+    width: 100%;
+    font-family: 'Segoe UI', sans-serif;
+    overflow: hidden; /* Prevent body scroll */
+    display: flex;
+    flex-direction: column;
 }
 
-/* --- MAIN LAYOUT --- */
+/* --- MAIN CONTAINER --- */
 .app-container {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    position: relative;
+    height: 100vh; /* Full viewport height */
 }
 
 /* --- HEADER --- */
 .main-header {
+    flex-shrink: 0; /* Header won't shrink */
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
+    padding: 15px 25px;
     border-bottom: 1px solid #f0f0f0;
-    background: white;
-    flex-shrink: 0; /* Header stays same size */
+    background: #fff;
 }
 
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
+.header-left { display: flex; align-items: center; gap: 8px; }
+h1 { font-size: 24px; letter-spacing: 2px; color: #333; }
 
-h1 {
-    font-size: 22px;
-    letter-spacing: 3px;
-    margin: 0;
-    color: #333;
-    font-weight: bold;
-}
-
-.icon-btn {
-    background: none;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-    color: #666;
-}
-
-/* --- CHAT AREA (THE SPACER) --- */
+/* --- CHAT AREA (THIS PART IS THE KEY) --- */
 .chat-area {
-    flex: 1; /* This pushes the input to the bottom */
+    flex: 1; /* Grows to fill ALL available space */
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    position: relative;
+    overflow: hidden; /* Scroll happens inside response-display */
+    background-color: #ffffff;
 }
 
 .response-display {
-    flex: 1;
+    flex: 1; /* Fills the chat-area */
+    overflow-y: auto;
     padding: 20px;
-    overflow-y: auto; /* Only this part scrolls */
-    display: flex;
-    flex-direction: column;
-    max-width: 900px;
+    width: 100%;
+    max-width: 800px;
     margin: 0 auto;
-    width: 100%;
-}
-
-.user-q {
-    align-self: flex-end;
-    background: #f1f1f1;
-    padding: 12px 18px;
-    border-radius: 15px 15px 0 15px;
-    margin: 10px 0;
-    max-width: 80%;
-    word-wrap: break-word;
-}
-
-.ai-res {
-    align-self: flex-start;
-    color: #f39c12;
-    padding: 10px;
-    margin: 10px 0;
-    line-height: 1.6;
-    max-width: 90%;
-}
-
-/* --- PLUS POPUP MENU --- */
-.plus-popup-menu {
-    display: none;
-    position: absolute;
-    bottom: 85px; /* Sits above the input bar */
-    left: 20px;
-    background: white;
-    border: 2px solid #f39c12;
-    border-radius: 15px;
-    width: 200px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    z-index: 1000;
-    flex-direction: column;
-}
-
-.plus-popup-menu button {
-    background: none;
-    border: none;
-    padding: 12px 15px;
-    text-align: left;
-    width: 100%;
-    cursor: pointer;
-    font-size: 14px;
-    border-bottom: 1px solid #eee;
     display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.plus-popup-menu button i {
-    color: #f39c12;
-    width: 20px;
-    text-align: center;
-}
-
-.plus-popup-menu button:hover {
-    background: #fff9f0;
+    flex-direction: column;
 }
 
 /* --- INPUT SECTION (LOCKED TO BOTTOM) --- */
 .input-section {
-    padding: 15px 20px;
-    background: white;
-    flex-shrink: 0;
+    flex-shrink: 0; /* Stays at the bottom */
+    padding: 20px;
+    background: #fff;
+    width: 100%;
+    position: relative;
 }
 
 .orange-input-wrapper {
@@ -144,10 +65,9 @@ h1 {
     border-radius: 30px;
     display: flex;
     align-items: center;
-    padding: 5px 15px;
-    max-width: 800px;
+    padding: 5px 20px;
+    max-width: 700px;
     margin: 0 auto;
-    background: white;
 }
 
 textarea {
@@ -155,74 +75,36 @@ textarea {
     border: none;
     outline: none;
     resize: none;
-    height: 40px;
+    height: 45px;
     font-size: 16px;
-    padding: 10px 5px;
-    background: transparent;
+    padding: 12px 0;
 }
 
-.plus-btn {
-    font-size: 28px;
-    color: #f39c12;
-    background: none;
-    border: none;
-    cursor: pointer;
-    margin-right: 10px;
-    display: flex;
-    align-items: center;
-}
+/* --- BUTTONS --- */
+.plus-btn { font-size: 30px; color: #f39c12; background: none; border: none; cursor: pointer; margin-right: 15px; }
+.send-btn { color: #f39c12; background: none; border: 2px solid #f39c12; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; }
 
-.send-btn {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    border: 2px solid #f39c12;
-    color: #f39c12;
-    background: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: 0.2s;
-}
-
-.send-btn:hover {
-    background: #f39c12;
-    color: white;
-}
-
-/* --- SIDEBAR --- */
-.sidebar {
-    position: fixed;
-    right: -350px;
-    top: 0;
-    width: 300px;
-    height: 100%;
+/* --- POPUP MENU --- */
+.plus-popup-menu {
+    display: none;
+    position: absolute;
+    bottom: 85px;
+    left: 50%;
+    transform: translateX(-50%);
     background: white;
-    box-shadow: -5px 0 15px rgba(0,0,0,0.1);
-    transition: 0.3s;
-    z-index: 2000;
-    padding: 20px;
+    border: 2px solid #f39c12;
+    border-radius: 15px;
+    width: 200px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    z-index: 1000;
+    flex-direction: column;
 }
 
-.sidebar.active {
-    right: 0;
+.plus-popup-menu button {
+    background: none; border: none; padding: 12px; text-align: left;
+    width: 100%; cursor: pointer; border-bottom: 1px solid #eee;
+    display: flex; align-items: center; gap: 10px;
 }
 
-.branding {
-    text-align: center;
-    font-size: 11px;
-    color: #bbb;
-    margin-top: 5px;
-}
-
-/* --- MOBILE OPTIMIZATION --- */
-@media (max-width: 600px) {
-    .plus-popup-menu {
-        width: 170px;
-        left: 10px;
-    }
-    .orange-input-wrapper {
-        width: 100%;
-    }
-}
+/* --- BRANDING --- */
+.branding { text-align: center; font-size: 11px; color: #ccc; margin-top: 10px; }
