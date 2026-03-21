@@ -1,200 +1,54 @@
-/* --- 1. GLOBAL RESET --- */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+/* --- GLOBAL RESET --- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body, html {
     height: 100vh;
     width: 100vw;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #ffffff;
-    overflow: hidden; /* Prevents the whole screen from scrolling */
-}
-
-/* --- 2. MAIN LAYOUT --- */
-.app-container {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #fff;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    position: relative;
 }
 
-/* --- 3. HEADER --- */
+/* --- LAYOUT --- */
+.app-container { display: flex; flex-direction: column; height: 100vh; position: relative; }
+
 .main-header {
-    flex-shrink: 0; /* Keeps header fixed height */
+    flex-shrink: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 15px 25px;
     border-bottom: 1px solid #f0f0f0;
-    background: #fff;
-    z-index: 10;
 }
 
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-h1 {
-    font-size: 24px;
-    letter-spacing: 2px;
-    color: #333;
-    font-weight: bold;
-}
-
-.icon-btn {
-    background: none;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-    color: #666;
-}
-
-/* --- 4. CHAT AREA & MESSAGES --- */
-.chat-area {
-    flex: 1; /* Fills all space between header and footer */
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background-color: #fff;
-}
+/* --- CHAT AREA --- */
+.chat-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
 .response-display {
     flex: 1;
-    overflow-y: auto; /* Only messages scroll */
+    overflow-y: auto;
     padding: 20px;
-    width: 100%;
     max-width: 800px;
     margin: 0 auto;
-    display: flex;
-    flex-direction: column;
+    width: 100%;
 }
 
-.user-q {
-    align-self: flex-end;
-    background: #f1f1f1;
-    padding: 12px 18px;
-    border-radius: 15px 15px 0 15px;
-    margin: 10px 0;
-    max-width: 80%;
-}
-
-.ai-res {
-    align-self: flex-start;
-    color: #f39c12; /* Brand orange color */
-    padding: 10px;
-    margin: 10px 0;
-    line-height: 1.6;
-    max-width: 90%;
-}
-
-/* --- 5. INPUT BAR (LOCKED TO BOTTOM) --- */
-.input-section {
-    flex-shrink: 0;
-    padding: 15px 20px;
-    background: #fff;
-    border-top: 1px solid #f0f0f0;
-    z-index: 10;
-}
-
-.orange-input-wrapper {
-    border: 2px solid #f39c12;
-    border-radius: 30px;
-    display: flex;
-    align-items: center;
-    padding: 5px 20px;
-    max-width: 700px;
-    margin: 0 auto;
-}
-
-textarea {
-    flex: 1;
-    border: none;
-    outline: none;
-    resize: none;
-    height: 40px;
-    font-size: 16px;
-    padding: 10px 0;
-    background: transparent;
-}
-
-.plus-btn {
-    font-size: 30px;
-    color: #f39c12;
-    background: none;
-    border: none;
-    cursor: pointer;
-    margin-right: 15px;
-}
-
-.send-btn {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    border: 2px solid #f39c12;
-    color: #f39c12;
-    background: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* --- 6. SIDEBAR (FIXED OVERLAY) --- */
-.sidebar {
-    position: fixed; /* Takes it out of the bottom list flow */
-    right: -320px; /* Hidden off-screen */
-    top: 0;
-    width: 300px;
-    height: 100vh;
-    background: white;
-    box-shadow: -5px 0 15px rgba(0,0,0,0.1);
-    transition: 0.3s ease-in-out;
-    z-index: 9999; /* Higher than everything else */
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-}
-
-.sidebar.active {
-    right: 0; /* Slides in when active class is added */
-}
-
-.sidebar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid #f39c12;
-    padding-bottom: 15px;
-    margin-bottom: 15px;
-}
-
-.clear-btn {
-    background: #ff4d4d;
-    color: white;
-    border: none;
-    padding: 5px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-/* --- 7. POPUP MENU --- */
+/* --- VERTICAL PLUS MENU --- */
 .plus-popup-menu {
-    display: none;
+    display: none; /* Controlled by JS */
     position: absolute;
     bottom: 90px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 30px;
     background: white;
     border: 2px solid #f39c12;
     border-radius: 15px;
-    width: 200px;
+    width: 200px; /* Fixed width forces verticality */
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    z-index: 100;
+    z-index: 1000;
+    flex-direction: column; /* FORCES VERTICAL STACKING */
+    overflow: hidden;
 }
 
 .plus-popup-menu button {
@@ -204,24 +58,48 @@ textarea {
     text-align: left;
     width: 100%;
     cursor: pointer;
+    font-size: 14px;
     border-bottom: 1px solid #eee;
     display: flex;
     align-items: center;
     gap: 12px;
+    transition: background 0.2s;
 }
 
-.plus-popup-menu button i { color: #f39c12; width: 20px; }
-.plus-popup-menu button:hover { background: #fffcf5; }
+.plus-popup-menu button i { color: #f39c12; width: 20px; text-align: center; }
+.plus-popup-menu button:hover { background: #fff9f0; }
+.plus-popup-menu button:last-child { border-bottom: none; }
 
-/* --- 8. UTILITIES --- */
-.branding {
-    text-align: center;
-    font-size: 11px;
-    color: #ccc;
-    margin-top: 8px;
+/* --- INPUT BAR --- */
+.input-section { flex-shrink: 0; padding: 15px 20px; position: relative; }
+
+.orange-input-wrapper {
+    border: 2px solid #f39c12;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    padding: 5px 20px;
+    max-width: 750px;
+    margin: 0 auto;
 }
 
-@media (max-width: 600px) {
-    .orange-input-wrapper { width: 95%; }
-    .sidebar { width: 85%; }
+textarea { flex: 1; border: none; outline: none; resize: none; height: 40px; font-size: 16px; padding: 10px 0; }
+
+.plus-btn { font-size: 30px; color: #f39c12; background: none; border: none; cursor: pointer; margin-right: 15px; }
+.send-btn { color: #f39c12; border: 2px solid #f39c12; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; }
+
+/* --- SIDEBAR --- */
+.sidebar {
+    position: fixed;
+    right: -320px;
+    top: 0;
+    width: 300px;
+    height: 100%;
+    background: white;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+    transition: 0.3s ease;
+    z-index: 9999;
+    padding: 20px;
 }
+.sidebar.active { right: 0; }
+.branding { text-align: center; font-size: 11px; color: #ccc; margin-top: 5px; }

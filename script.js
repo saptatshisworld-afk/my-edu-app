@@ -1,46 +1,56 @@
-// Force init on load
 window.onload = () => { loadHistory(); };
 
-// Toggle the 7-option menu
+// Toggle Menu Logic
 function togglePlusMenu(event) {
-    event.stopPropagation();
+    if (event) event.stopPropagation();
     const menu = document.getElementById('plus-menu');
+    // We use 'flex' to respect the 'flex-direction: column' in CSS
     menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
 }
 
-// 1. Camera
+// 1. Camera Trigger
 function openCamera() {
     const input = document.getElementById('pdf-input');
     input.setAttribute('capture', 'camera');
     input.setAttribute('accept', 'image/*');
     input.click();
+    togglePlusMenu();
 }
 
 // 2, 3, 5. Files / Photos / PDF
 function openFiles() {
     const input = document.getElementById('pdf-input');
     input.removeAttribute('capture');
-    input.setAttribute('accept', '.pdf,.doc,.docx,.jpg,.png');
+    input.setAttribute('accept', '.pdf,.doc,.docx,.jpg,.png,.jpeg');
     input.click();
+    togglePlusMenu();
 }
 
-// Handling File Selection
-function handleFileUpload(event) {
-    const file = event.target.files[0];
-    if (file) {
-        document.getElementById('result').innerHTML += `<div class="user-q"><b>Uploaded:</b> ${file.name}</div>`;
-        // Trigger your backend upload logic here
+// 4, 6, 7. Text Prompts
+function startStudy() { 
+    document.getElementById('question').value = "I want to study: "; 
+    togglePlusMenu();
+}
+
+function startQuiz() { 
+    document.getElementById('question').value = "Generate a quiz about: "; 
+    togglePlusMenu();
+}
+
+function createImagePrompt() { 
+    document.getElementById('question').value = "Create an image of: "; 
+    togglePlusMenu();
+}
+
+// Global click to close menu
+window.onclick = function(event) {
+    const menu = document.getElementById('plus-menu');
+    if (menu && !event.target.matches('.plus-btn')) {
+        menu.style.display = 'none';
     }
 }
 
-// 4. Study & Learn / 6. Quizzes / 7. Create Image
-function startStudy() { alert("Starting Study Mode..."); }
-function startQuiz() { alert("Generating Quiz..."); }
-function createImagePrompt() { 
-    document.getElementById('question').value = "Create an image of: "; 
-}
-
-// AI Question logic
+// AI Interaction
 async function askQuestion() {
     const qInput = document.getElementById('question');
     const resBox = document.getElementById('result');
@@ -64,12 +74,6 @@ async function askQuestion() {
     resBox.scrollTop = resBox.scrollHeight;
 }
 
-// UI Toggles
-function toggleHistory() { document.getElementById('history-sidebar').classList.toggle('active'); }
-function togglePremiumMenu() {
-    const m = document.getElementById('premium-dropdown');
-    m.style.display = m.style.display === 'block' ? 'none' : 'block';
+function toggleHistory() {
+    document.getElementById('history-sidebar').classList.toggle('active');
 }
-
-// Close menu on outside click
-window.onclick = () => { document.getElementById('plus-menu').style.display = 'none'; };
