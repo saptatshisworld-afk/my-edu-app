@@ -12,58 +12,58 @@
         <header class="main-header">
             <div class="header-left">
                 <h1>EDUCATO</h1>
-                <button class="icon-btn arrow-btn" onclick="togglePremiumMenu()">
-                    <i class="fas fa-chevron-down"></i>
-                </button>
+                <div class="premium-wrapper">
+                    <button class="icon-btn arrow-btn" onclick="togglePremiumMenu(event)">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div id="premium-dropdown" class="dropdown-menu">
+                        <button class="upgrade-btn">Update to Premium</button>
+                    </div>
+                </div>
             </div>
-            <button class="icon-btn dots-btn" onclick="toggleHistory()">
+            <button class="icon-btn" onclick="toggleHistory()">
                 <i class="fas fa-ellipsis-v"></i>
             </button>
         </header>
 
-        <div id="premium-dropdown" class="dropdown-menu">
-            <button class="upgrade-btn">Update to Premium</button>
-        </div>
-
         <main class="chat-area">
-            <div id="result" class="response-display"></div>
-            
-            <div class="input-section">
-                <div id="plus-menu" class="plus-popup-menu">
-                    <button onclick="openCamera()"><i class="fas fa-camera"></i> Camera</button>
-                    <button onclick="openFiles()"><i class="fas fa-folder"></i> Files</button>
-                    <button onclick="openFiles()"><i class="fas fa-image"></i> Photos</button>
-                    <button onclick="startStudy()"><i class="fas fa-book-reader"></i> Study & Learn</button>
-                    <button onclick="openFiles()"><i class="fas fa-file-pdf"></i> Upload PDF</button>
-                    <button onclick="startQuiz()"><i class="fas fa-question-circle"></i> Quizzes</button>
-                    <button onclick="createImagePrompt()"><i class="fas fa-paint-brush"></i> Create Image</button>
+            <div id="result" class="response-display">
                 </div>
-
-                <div class="orange-input-wrapper">
-                    <button class="plus-btn" onclick="togglePlusMenu(event)">+</button>
-                    <textarea id="question" placeholder="Tell me"></textarea>
-                    <button class="send-btn" onclick="askQuestion()">
-                        <i class="fas fa-arrow-up"></i>
-                    </button>
-                </div>
-                <p class="branding">Powered by : TEAM SMGS</p>
-            </div>
         </main>
+
+        <footer class="input-section">
+            <div id="plus-menu" class="plus-popup-menu">
+                <button onclick="openCamera()"><i class="fas fa-camera"></i> Camera</button>
+                <button onclick="openFiles()"><i class="fas fa-folder"></i> Files</button>
+                <button onclick="openFiles()"><i class="fas fa-image"></i> Photos</button>
+                <button onclick="startStudy()"><i class="fas fa-book-open"></i> Study & Learn</button>
+                <button onclick="openFiles()"><i class="fas fa-file-pdf"></i> Upload PDF</button>
+                <button onclick="startQuiz()"><i class="fas fa-question-circle"></i> Quizzes</button>
+                <button onclick="createImagePrompt()"><i class="fas fa-pencil-alt"></i> Create Image</button>
+            </div>
+
+            <div class="orange-input-wrapper">
+                <button class="plus-btn" onclick="togglePlusMenu(event)">+</button>
+                <textarea id="question" placeholder="Tell me"></textarea>
+                <button class="send-btn" onclick="askQuestion()">
+                    <i class="fas fa-arrow-up"></i>
+                    <div class="spinner"></div>
+                </button>
+            </div>
+            <p class="branding">Powered by : TEAM SMGS</p>
+        </footer>
 
         <div id="history-sidebar" class="sidebar">
             <div class="sidebar-header">
                 <h3>Recent History</h3>
-                <div class="header-actions">
-                    <button onclick="clearChat()" class="clear-btn">Clear</button>
-                    <button onclick="toggleHistory()" class="close-btn">&times;</button>
-                </div>
+                <button onclick="toggleHistory()">×</button>
             </div>
             <div id="historyList"></div>
         </div>
     </div>
 
-    <input type="file" id="pdf-input" style="display: none;" onchange="handleFileUpload(event)">
-
+    <input type="file" id="pdf-input" style="display:none;">
+    
     <script src="script.js"></script>
 </body>
 </html>

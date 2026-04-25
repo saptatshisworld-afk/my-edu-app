@@ -1,64 +1,48 @@
 window.onload = () => { loadHistory(); };
 
-// Toggle Menu Logic
+// Toggle Dropdowns
+function togglePremiumMenu(event) {
+    event.stopPropagation();
+    const dropdown = document.getElementById('premium-dropdown');
+    dropdown.style.display = (dropdown.style.display === 'block') ? 'none' : 'block';
+}
+
 function togglePlusMenu(event) {
-    if (event) event.stopPropagation();
+    event.stopPropagation();
     const menu = document.getElementById('plus-menu');
-    // We use 'flex' to respect the 'flex-direction: column' in CSS
     menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
 }
 
-// 1. Camera Trigger
-function openCamera() {
-    const input = document.getElementById('pdf-input');
-    input.setAttribute('capture', 'camera');
-    input.setAttribute('accept', 'image/*');
-    input.click();
-    togglePlusMenu();
+function toggleHistory() {
+    document.getElementById('history-sidebar').classList.toggle('active');
 }
 
-// 2, 3, 5. Files / Photos / PDF
-function openFiles() {
-    const input = document.getElementById('pdf-input');
-    input.removeAttribute('capture');
-    input.setAttribute('accept', '.pdf,.doc,.docx,.jpg,.png,.jpeg');
-    input.click();
-    togglePlusMenu();
-}
+// Global click closer
+window.onclick = () => {
+    document.getElementById('plus-menu').style.display = 'none';
+    document.getElementById('premium-dropdown').style.display = 'none';
+};
 
-// 4, 6, 7. Text Prompts
-function startStudy() { 
-    document.getElementById('question').value = "I want to study: "; 
-    togglePlusMenu();
-}
+// Menu Actions
+function openCamera() { document.getElementById('pdf-input').setAttribute('capture', 'camera'); document.getElementById('pdf-input').click(); }
+function openFiles() { document.getElementById('pdf-input').removeAttribute('capture'); document.getElementById('pdf-input').click(); }
+function startStudy() { document.getElementById('question').value = "I want to study: "; }
+function startQuiz() { document.getElementById('question').value = "Generate a quiz for: "; }
+function createImagePrompt() { document.getElementById('question').value = "Create an image of: "; }
 
-function startQuiz() { 
-    document.getElementById('question').value = "Generate a quiz about: "; 
-    togglePlusMenu();
-}
-
-function createImagePrompt() { 
-    document.getElementById('question').value = "Create an image of: "; 
-    togglePlusMenu();
-}
-
-// Global click to close menu
-window.onclick = function(event) {
-    const menu = document.getElementById('plus-menu');
-    if (menu && !event.target.matches('.plus-btn')) {
-        menu.style.display = 'none';
-    }
-}
-
-// AI Interaction
+// Main Chat Logic
 async function askQuestion() {
     const qInput = document.getElementById('question');
     const resBox = document.getElementById('result');
+    const sendBtn = document.querySelector('.send-btn');
     const q = qInput.value.trim();
-    if (!q) return;
+
+    if (!q || sendBtn.classList.contains('loading')) return;
 
     resBox.innerHTML += `<div class="user-q"><b>You:</b> ${q}</div>`;
     qInput.value = '';
+    sendBtn.classList.add('loading');
+    resBox.scrollTop = resBox.scrollHeight;
 
     try {
         const res = await fetch('/ask-ai', {
@@ -69,11 +53,18 @@ async function askQuestion() {
         const data = await res.json();
         resBox.innerHTML += `<div class="ai-res"><b>EDUCATO:</b> ${data.chatgpt}</div>`;
     } catch (err) {
-        resBox.innerHTML += `<div class="ai-res" style="color:red;">Error connecting to server.</div>`;
+        resBox.innerHTML += `<div class="ai-res" style="color:red;">EDUCATO: Server error.</div>`;
+    } finally {
+        sendBtn.classList.remove('loading');
+        resBox.scrollTop = resBox.scrollHeight;
     }
-    resBox.scrollTop = resBox.scrollHeight;
 }
 
-function toggleHistory() {
-    document.getElementById('history-sidebar').classList.toggle('active');
+async function loadHistory() {
+    const list = document.getElementById('historyList');
+    try {
+        const res = await fetch('/history');
+        const data = await res.json();
+        if(list) list.innerHTML = data.map(item => `<div class="history-item">${item.question.substring(0, 30)}...</div>`).join('');
+    } catch (e) { console.log("History error"); }
 }
