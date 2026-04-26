@@ -1,6 +1,6 @@
-window.onload = () => { loadHistory(); };
+let isSignUp = false;
 
-// Toggle Dropdowns
+// UI Toggles
 function togglePremiumMenu(event) {
     event.stopPropagation();
     const dropdown = document.getElementById('premium-dropdown');
@@ -13,24 +13,28 @@ function togglePlusMenu(event) {
     menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
 }
 
-function toggleHistory() {
-    document.getElementById('history-sidebar').classList.toggle('active');
+function toggleHistory() { document.getElementById('history-sidebar').classList.toggle('active'); }
+function openAuthModal() { document.getElementById('auth-modal').style.display = 'flex'; }
+function closeAuthModal() { document.getElementById('auth-modal').style.display = 'none'; }
+
+function toggleAuthMode() {
+    isSignUp = !isSignUp;
+    document.getElementById('modal-title').innerText = isSignUp ? "Create Account" : "Welcome Back";
+    document.querySelector('.auth-submit-btn').innerText = isSignUp ? "Sign Up" : "Continue";
 }
 
-// Global click closer
 window.onclick = () => {
     document.getElementById('plus-menu').style.display = 'none';
     document.getElementById('premium-dropdown').style.display = 'none';
 };
 
-// Menu Actions
+// Actions
 function openCamera() { document.getElementById('pdf-input').setAttribute('capture', 'camera'); document.getElementById('pdf-input').click(); }
 function openFiles() { document.getElementById('pdf-input').removeAttribute('capture'); document.getElementById('pdf-input').click(); }
 function startStudy() { document.getElementById('question').value = "I want to study: "; }
 function startQuiz() { document.getElementById('question').value = "Generate a quiz for: "; }
-function createImagePrompt() { document.getElementById('question').value = "Create an image of: "; }
 
-// Main Chat Logic
+// AI logic
 async function askQuestion() {
     const qInput = document.getElementById('question');
     const resBox = document.getElementById('result');
@@ -58,13 +62,4 @@ async function askQuestion() {
         sendBtn.classList.remove('loading');
         resBox.scrollTop = resBox.scrollHeight;
     }
-}
-
-async function loadHistory() {
-    const list = document.getElementById('historyList');
-    try {
-        const res = await fetch('/history');
-        const data = await res.json();
-        if(list) list.innerHTML = data.map(item => `<div class="history-item">${item.question.substring(0, 30)}...</div>`).join('');
-    } catch (e) { console.log("History error"); }
 }
