@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EDUCATO - AI Partner</title>
+    <!-- Font Awesome: Required for the arrow and plus icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Your Style: Must be linked here to fix the layout in Screenshot (145) -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -23,7 +25,8 @@
 
     <main>
         <div id="chat-container">
-            </div>
+            <!-- AI and User messages will appear here -->
+        </div>
 
         <div class="input-area">
             <div class="input-wrapper">
@@ -38,17 +41,19 @@
         </div>
     </main>
 
+    <!-- Authentication Modal -->
     <div id="auth-modal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeAuthModal()">&times;</span>
             <h2 id="modal-title">Sign In</h2>
             <input type="email" id="auth-email" placeholder="Email">
-            <input type="password" id="auth-password" placeholder="Password">
+            <input type="password" id="auth-password" placeholder="Password (min. 6 chars)">
             <button id="auth-submit-btn" onclick="handleAuth()">Submit</button>
-            <p id="auth-toggle-text">Don't have an account? <span onclick="toggleAuthMode()">Sign Up</span></p>
+            <p id="auth-toggle-text">Don't have an account? <span onclick="toggleAuthMode()" style="color: blue; cursor: pointer;">Sign Up</span></p>
         </div>
     </div>
 
+    <!-- type="module" is critical for Firebase imports to work -->
     <script type="module" src="script.js"></script>
 </body>
 </html>
