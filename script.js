@@ -1,8 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// --- CONFIGURATION ---
-// Replace these placeholders with your actual keys from Firebase Project Settings
+// REPLACE THESE WITH YOUR ACTUAL KEYS FROM FIREBASE SETTINGS
 const firebaseConfig = {
   apiKey: "AIzaSyCPgpohdOyA4XvCdFidJDCkEKySzyPX9gQ",
   authDomain: "educato-35d31.firebaseapp.com",
@@ -10,14 +9,13 @@ const firebaseConfig = {
   storageBucket: "educato-35d31.firebasestorage.app",
   messagingSenderId: "252748112899",
   appId: "1:252748112899:web:c1eaf0f6a6213199ab1a36",
-  measurementId: "G-M5J93M808T"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 let isSignUpMode = false;
 
-// --- MODAL CONTROLS ---
+// Attach functions to 'window' so HTML buttons can access them
 window.openAuthModal = () => {
     document.getElementById('auth-modal').style.display = 'block';
 };
@@ -34,7 +32,6 @@ window.toggleAuthMode = () => {
         "Don't have an account? <span onclick='toggleAuthMode()' style='color:blue; cursor:pointer;'>Sign Up</span>";
 };
 
-// --- AUTHENTICATION LOGIC ---
 window.handleAuth = async () => {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
@@ -42,47 +39,40 @@ window.handleAuth = async () => {
     try {
         if (isSignUpMode) {
             await createUserWithEmailAndPassword(auth, email, password);
-            alert("Success! Account created.");
+            alert("Account created successfully!");
         } else {
             await signInWithEmailAndPassword(auth, email, password);
-            alert("Success! Logged in.");
+            alert("Signed in successfully!");
         }
         window.closeAuthModal();
     } catch (error) {
-        alert("Error: " + error.message);
+        alert("Auth Error: " + error.message);
     }
 };
 
-// --- AI CHAT LOGIC ---
 window.askQuestion = async () => {
     const input = document.getElementById('user-input');
     const chatContainer = document.getElementById('chat-container');
-    const prompt = input.value.trim();
+    const question = input.value.trim();
 
-    if (!prompt) return;
+    if (!question) return;
 
-    chatContainer.innerHTML += `<div class="user-msg"><strong>You:</strong> ${prompt}</div>`;
+    chatContainer.innerHTML += `<p><strong>You:</strong> ${question}</p>`;
     input.value = '';
 
     try {
         const response = await fetch('https://my-edu-app-1.onrender.com/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt })
+            body: JSON.stringify({ prompt: question })
         });
         const data = await response.json();
-        chatContainer.innerHTML += `<div class="ai-msg"><strong>EDUCATO:</strong> ${data.response}</div>`;
+        chatContainer.innerHTML += `<p><strong>EDUCATO:</strong> ${data.response}</p>`;
     } catch (err) {
-        chatContainer.innerHTML += `<div class="error-msg"><strong>EDUCATO:</strong> AI failed. Check Gemini Key in Render.</div>`;
+        chatContainer.innerHTML += `<p><strong>EDUCATO:</strong> AI failed. Check your Gemini Key in Render.</p>`;
     }
     chatContainer.scrollTop = chatContainer.scrollHeight;
 };
 
-window.handleKeyPress = (e) => {
-    if (e.key === 'Enter') window.askQuestion();
-};
-
-window.togglePlusMenu = (e) => {
-    e.stopPropagation();
-    alert("Plus menu functionality coming soon!");
-};
+window.handleKeyPress = (e) => { if (e.key === 'Enter') window.askQuestion(); };
+window.togglePlusMenu = (e) => { e.stopPropagation(); alert("Menu coming soon!"); };
