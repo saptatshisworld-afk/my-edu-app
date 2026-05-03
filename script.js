@@ -3,12 +3,12 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } f
 
 // REPLACE THESE WITH YOUR ACTUAL KEYS FROM FIREBASE SETTINGS
 const firebaseConfig = {
-  apiKey: "AIzaSyCPgpohdOyA4XvCdFidJDCkEKySzyPX9gQ",
+  apiKey: "YOUR_ACTUAL_API_KEY",
   authDomain: "educato-35d31.firebaseapp.com",
   projectId: "educato-35d31",
-  storageBucket: "educato-35d31.firebasestorage.app",
-  messagingSenderId: "252748112899",
-  appId: "1:252748112899:web:c1eaf0f6a6213199ab1a36",
+  storageBucket: "educato-35d31.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
